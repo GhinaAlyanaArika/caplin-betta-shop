@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐠 CAPLIN BETTA SHOP — Sistem Pemesanan Ikan Hias</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-abyss: #020E18;
+            --ocean-deep: #041C2C;
+            --ocean-dark: #0A3142;
+            --ocean-mid: #0E4D64;
+            --ocean-light: #1A7A8A;
+            --aqua: #00D4AA;
+            --aqua-glow: #00F5C8;
+            --aqua-dim: #008B70;
+            --coral: #FF6B6B;
+            --coral-soft: #FF9E9E;
+            --gold: #F5C842;
+            --sand: #F5F0E8;
+            --foam: #E0F5F0;
+            --card-bg: rgba(10, 49, 66, 0.55);
+            --card-border: rgba(0, 212, 170, 0.15);
+            --sidebar-w: 260px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--ocean-deep); color: #E0F5F0; overflow-x: hidden; min-height: 100vh; }
+        h1, h2, h3, .display-font { font-family: 'Cormorant Garamond', serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--ocean-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--ocean-mid); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--aqua-dim); }
+
+        #loginScreen {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(170deg, #020E18 0%, #062B3E 35%, #0A4255 55%, #0D5E6B 75%, #041C2C 100%);
+            overflow: hidden;
+        }
+        .login-scene { position: absolute; inset: 0; pointer-events: none; }
+        .moon {
+            position: absolute; top: 8%; right: 18%; width: 80px; height: 80px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #FFFDE8, #F5E6A3 60%, #D4C06E);
+            box-shadow: 0 0 40px 15px rgba(245, 230, 163, 0.15), 0 0 100px 40px rgba(245, 230, 163, 0.06);
+        }
+        .moon::after { content: ''; position: absolute; top: 12px; left: 18px; width: 18px; height: 18px; border-radius: 50%; background: rgba(200, 180, 100, 0.25); }
+        .mountains { position: absolute; bottom: 18%; left: 0; right: 0; height: 200px; }
+        .mountain { position: absolute; bottom: 0; width: 0; height: 0; border-style: solid; }
+        .mountain-1 { left: -5%; border-width: 0 220px 160px 180px; border-color: transparent transparent #031520 transparent; }
+        .mountain-2 { left: 20%; border-width: 0 280px 190px 200px; border-color: transparent transparent #041A28 transparent; }
+        .mountain-3 { left: 50%; border-width: 0 250px 170px 300px; border-color: transparent transparent #031520 transparent; }
+        .mountain-4 { right: -5%; border-width: 0 300px 140px 220px; border-color: transparent transparent #041A28 transparent; }
+        .water { position: absolute; bottom: 0; left: 0; right: 0; height: 22%; background: linear-gradient(to bottom, rgba(4,28,44,0) 0%, rgba(4,28,44,0.7) 30%, #041C2C 100%); }
+        .wave { position: absolute; top: -20px; left: -10%; width: 120%; height: 40px; animation: waveMove 8s ease-in-out infinite; }
+        .wave path { fill: rgba(14, 77, 100, 0.3); }
+        .wave-2 { top: -10px; animation-delay: -3s; animation-duration: 10s; }
+        .wave-2 path { fill: rgba(14, 77, 100, 0.2); }
+        @keyframes waveMove { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(-30px); } }
+        .bubble {
+            position: absolute; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(0, 245, 200, 0.15), rgba(0, 212, 170, 0.03));
+            border: 1px solid rgba(0, 212, 170, 0.1); animation: bubbleRise linear infinite;
+        }
+        @keyframes bubbleRise {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.7; }
+            50% { transform: translateY(-40vh) translateX(15px) scale(1.1); opacity: 0.5; }
+            100% { transform: translateY(-85vh) translateX(-10px) scale(0.8); opacity: 0; }
+        }
+        .star { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #FFFDE8; animation: twinkle 3s ease-in-out infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        .login-card {
+            position: relative; z-index: 10; width: 420px; max-width: 92vw; padding: 48px 40px;
+            background: rgba(4, 28, 44, 0.65); backdrop-filter: blur(20px) saturate(1.4);
+            -webkit-backdrop-filter: blur(20px) saturate(1.4);
+            border: 1px solid rgba(0, 212, 170, 0.12); border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .login-card .brand {
+            text-align: center; margin-bottom: 8px; font-family: 'Cormorant Garamond', serif;
+            font-size: 28px; font-weight: 700; letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--aqua-glow), var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .login-card .subtitle { text-align: center; font-size: 13px; color: rgba(224, 245, 240, 0.5); margin-bottom: 32px; letter-spacing: 1px; }
+        .login-card .form-group { margin-bottom: 20px; position: relative; }
+        .login-card label { display: block; font-size: 12px; font-weight: 600; color: var(--aqua); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .login-card input {
+            width: 100%; padding: 12px 16px 12px 42px; background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 212, 170, 0.15); border-radius: 10px; color: #E0F5F0;
+            font-size: 14px; font-family: 'DM Sans', sans-serif; transition: all 0.3s ease;
+        }
+        .login-card input::placeholder { color: rgba(224, 245, 240, 0.3); }
+        .login-card input:focus { outline: none; border-color: var(--aqua); box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.1); background: rgba(0, 0, 0, 0.45); }
+        .login-card .input-icon { position: absolute; left: 14px; bottom: 14px; color: rgba(0, 212, 170, 0.4); font-size: 14px; }
+        .btn-login {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--aqua-dim), var(--aqua));
+            color: #020E18; font-weight: 700; font-size: 15px; border: none; border-radius: 10px;
+            cursor: pointer; letter-spacing: 1px; text-transform: uppercase; transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 212, 170, 0.25); margin-top: 8px;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0, 212, 170, 0.35); background: linear-gradient(135deg, var(--aqua), var(--aqua-glow)); }
+        .btn-login:active { transform: translateY(0); }
+        .login-error { display: none; text-align: center; padding: 10px; background: rgba(255, 107, 107, 0.1); border: 1px solid rgba(255, 107, 107, 0.3); border-radius: 8px; color: var(--coral-soft); font-size: 13px; margin-bottom: 16px; }
+
+        #mainApp { display: none; min-height: 100vh; }
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w);
+            background: linear-gradient(180deg, var(--ocean-abyss) 0%, var(--ocean-deep) 100%);
+            border-right: 1px solid rgba(0, 212, 170, 0.08); z-index: 100;
+            display: flex; flex-direction: column; transition: transform 0.3s ease;
+        }
+        .sidebar-brand { padding: 28px 24px 20px; border-bottom: 1px solid rgba(0, 212, 170, 0.08); }
+        .sidebar-brand h2 { font-size: 20px; font-weight: 700; letter-spacing: 1.5px; background: linear-gradient(135deg, var(--aqua-glow), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .sidebar-brand p { font-size: 11px; color: rgba(224,245,240,0.35); margin-top: 4px; letter-spacing: 0.5px; }
+        .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+        .nav-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: rgba(224,245,240,0.25); letter-spacing: 1.5px; padding: 16px 12px 8px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: 10px; color: rgba(224,245,240,0.55); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-bottom: 2px; text-decoration: none; }
+        .nav-item:hover { background: rgba(0, 212, 170, 0.06); color: rgba(224,245,240,0.8); }
+        .nav-item.active { background: linear-gradient(135deg, rgba(0, 212, 170, 0.12), rgba(0, 212, 170, 0.04)); color: var(--aqua-glow); font-weight: 600; box-shadow: inset 3px 0 0 var(--aqua); }
+        .nav-item i { width: 20px; text-align: center; font-size: 15px; }
+        .nav-item .emoji { font-size: 16px; }
+        .nav-divider { height: 1px; background: rgba(0, 212, 170, 0.06); margin: 8px 16px; }
+        .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(0, 212, 170, 0.08); }
+        .nav-logout { color: var(--coral-soft) !important; }
+        .nav-logout:hover { background: rgba(255, 107, 107, 0.08) !important; }
+
+        .main-content { margin-left: var(--sidebar-w); min-height: 100vh; background: linear-gradient(135deg, #061E2E 0%, #0A2E3C 50%, #082838 100%); }
+        .topbar {
+            position: sticky; top: 0; z-index: 50; padding: 16px 32px;
+            background: rgba(4, 28, 44, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 212, 170, 0.06); display: flex; align-items: center; justify-content: space-between;
+        }
+        .topbar-title { font-size: 13px; color: rgba(224,245,240,0.4); letter-spacing: 1px; text-transform: uppercase; }
+        .topbar-title span { color: var(--aqua); font-weight: 600; }
+        .topbar-user { display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(224,245,240,0.6); }
+        .topbar-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--aqua-dim), var(--aqua)); display: flex; align-items: center; justify-content: center; color: var(--ocean-abyss); font-weight: 700; font-size: 14px; }
+        .hamburger { display: none; background: none; border: none; color: var(--aqua); font-size: 20px; cursor: pointer; }
+        .page-content { padding: 32px; }
+        .view-section { display: none; animation: fadeSlideIn 0.35s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+        .dash-welcome {
+            background: linear-gradient(135deg, rgba(0,212,170,0.08), rgba(0,212,170,0.02));
+            border: 1px solid var(--card-border); border-radius: 16px; padding: 32px; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 24px; position: relative; overflow: hidden;
+        }
+        .dash-welcome::after { content: ''; position: absolute; right: -30px; top: -30px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,170,0.06), transparent 70%); }
+        .dash-welcome-icon { width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, var(--aqua-dim), var(--aqua)); display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+        .dash-welcome h1 { font-size: 26px; font-weight: 700; color: #E0F5F0; }
+        .dash-welcome p { font-size: 14px; color: rgba(224,245,240,0.45); margin-top: 4px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 24px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); border-color: rgba(0, 212, 170, 0.25); }
+        .stat-card .stat-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+        .stat-card .stat-value { font-size: 32px; font-weight: 700; line-height: 1; font-family: 'Cormorant Garamond', serif; }
+        .stat-card .stat-label { font-size: 12px; color: rgba(224,245,240,0.4); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .betta-showcase { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 40px; text-align: center; position: relative; overflow: hidden; }
+        .betta-showcase h3 { font-size: 22px; margin-bottom: 8px; color: var(--aqua-glow); }
+        .betta-showcase p { font-size: 13px; color: rgba(224,245,240,0.4); margin-bottom: 24px; }
+
+        .data-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+        .data-header h2 { font-size: 24px; font-weight: 700; }
+        .data-header .header-actions { display: flex; gap: 10px; align-items: center; }
+        .search-box { padding: 9px 14px 9px 36px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,212,170,0.12); border-radius: 8px; color: #E0F5F0; font-size: 13px; font-family: 'DM Sans', sans-serif; width: 240px; transition: all 0.3s ease; }
+        .search-box:focus { outline: none; border-color: var(--aqua); }
+        .search-wrap { position: relative; }
+        .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: rgba(0,212,170,0.35); font-size: 13px; }
+        .btn-add { padding: 9px 20px; background: linear-gradient(135deg, var(--aqua-dim), var(--aqua)); color: var(--ocean-abyss); font-weight: 600; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; gap: 6px; }
+        .btn-add:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,212,170,0.3); }
+        .table-wrap { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; overflow: hidden; backdrop-filter: blur(8px); }
+        .table-wrap table { width: 100%; border-collapse: collapse; }
+        .table-wrap thead th { padding: 14px 18px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(224,245,240,0.4); background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(0,212,170,0.08); }
+        .table-wrap tbody tr { border-bottom: 1px solid rgba(0,212,170,0.04); transition: background 0.2s ease; }
+        .table-wrap tbody tr:hover { background: rgba(0, 212, 170, 0.04); }
+        .table-wrap tbody tr:last-child { border-bottom: none; }
+        .table-wrap tbody td { padding: 14px 18px; font-size: 14px; color: rgba(224,245,240,0.75); }
+        .table-wrap .td-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid rgba(0,212,170,0.1); }
+        .table-actions { display: flex; gap: 6px; }
+        .btn-action { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(0,212,170,0.12); background: rgba(0,0,0,0.2); color: rgba(224,245,240,0.6); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: all 0.2s ease; }
+        .btn-action.edit:hover { background: rgba(0,212,170,0.15); color: var(--aqua); border-color: var(--aqua); }
+        .btn-action.delete:hover { background: rgba(255,107,107,0.15); color: var(--coral); border-color: var(--coral); }
+        .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+        .badge-selesai { background: rgba(0,212,170,0.12); color: var(--aqua-glow); }
+        .badge-proses { background: rgba(245,200,66,0.12); color: var(--gold); }
+        .badge-dikirim { background: rgba(100,149,237,0.12); color: #6495ED; }
+        .badge-admin { background: rgba(0,212,170,0.12); color: var(--aqua-glow); }
+        .badge-user { background: rgba(245,200,66,0.12); color: var(--gold); }
+        .empty-state { text-align: center; padding: 60px 20px; color: rgba(224,245,240,0.3); font-size: 14px; }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; display: block; opacity: 0.3; }
+
+        .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(2, 14, 24, 0.75); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.show { display: flex; animation: modalFadeIn 0.25s ease; }
+        @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal-box { width: 520px; max-width: 100%; max-height: 90vh; overflow-y: auto; background: linear-gradient(180deg, #0A2E3C, #072530); border: 1px solid rgba(0, 212, 170, 0.15); border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,0.5); animation: modalSlideUp 0.3s ease; }
+        @keyframes modalSlideUp { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .modal-header { padding: 24px 28px 0; display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h3 { font-size: 20px; font-weight: 700; }
+        .modal-close { width: 32px; height: 32px; border-radius: 8px; border: 1px solid rgba(0,212,170,0.1); background: transparent; color: rgba(224,245,240,0.4); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .modal-close:hover { background: rgba(255,107,107,0.1); color: var(--coral); border-color: var(--coral); }
+        .modal-body { padding: 24px 28px 28px; }
+        .form-row { margin-bottom: 18px; }
+        .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--aqua); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 11px 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(0,212,170,0.12); border-radius: 8px; color: #E0F5F0; font-size: 14px; font-family: 'DM Sans', sans-serif; transition: all 0.3s ease; }
+        .form-row input::placeholder, .form-row textarea::placeholder { color: rgba(224,245,240,0.25); }
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus { outline: none; border-color: var(--aqua); box-shadow: 0 0 0 3px rgba(0,212,170,0.08); }
+        .form-row select { cursor: pointer; }
+        .form-row select option { background: #0A2E3C; color: #E0F5F0; }
+        .form-row textarea { resize: vertical; min-height: 70px; }
+        .form-row .file-upload { border: 2px dashed rgba(0,212,170,0.15); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; color: rgba(224,245,240,0.35); font-size: 13px; }
+        .form-row .file-upload:hover { border-color: var(--aqua); color: rgba(224,245,240,0.5); }
+        .form-row .file-upload i { font-size: 24px; margin-bottom: 8px; display: block; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+        .btn-save { padding: 11px 28px; background: linear-gradient(135deg, var(--aqua-dim), var(--aqua)); color: var(--ocean-abyss); font-weight: 700; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.25s ease; }
+        .btn-save:hover { box-shadow: 0 4px 20px rgba(0,212,170,0.3); transform: translateY(-1px); }
+        .btn-cancel { padding: 11px 24px; background: rgba(0,0,0,0.3); border: 1px solid rgba(0,212,170,0.12); color: rgba(224,245,240,0.6); font-weight: 500; font-size: 14px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-cancel:hover { background: rgba(0,0,0,0.5); color: #E0F5F0; }
+
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 300; display: flex; flex-direction: column; gap: 8px; }
+        .toast { padding: 14px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease; box-shadow: 0 8px 30px rgba(0,0,0,0.4); min-width: 280px; }
+        .toast.success { background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.3); color: var(--aqua-glow); }
+        .toast.error { background: rgba(255,107,107,0.15); border: 1px solid rgba(255,107,107,0.3); color: var(--coral-soft); }
+        .toast.warning { background: rgba(245,200,66,0.15); border: 1px solid rgba(245,200,66,0.3); color: var(--gold); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        .toast-exit { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(40px); } }
+
+        .confirm-overlay { position: fixed; inset: 0; z-index: 250; background: rgba(2, 14, 24, 0.8); display: none; align-items: center; justify-content: center; }
+        .confirm-overlay.show { display: flex; }
+        .confirm-box { background: linear-gradient(180deg, #0A2E3C, #072530); border: 1px solid rgba(255,107,107,0.2); border-radius: 14px; padding: 32px; text-align: center; max-width: 380px; width: 90%; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: modalSlideUp 0.25s ease; }
+        .confirm-box i { font-size: 40px; color: var(--coral); margin-bottom: 16px; }
+        .confirm-box h4 { font-size: 18px; margin-bottom: 8px; }
+        .confirm-box p { font-size: 13px; color: rgba(224,245,240,0.5); margin-bottom: 24px; }
+        .confirm-actions { display: flex; gap: 10px; justify-content: center; }
+        .btn-danger { padding: 10px 24px; background: var(--coral); color: #fff; font-weight: 600; font-size: 13px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-danger:hover { background: #ff5252; box-shadow: 0 4px 16px rgba(255,107,107,0.3); }
+
+        .jwt-info { margin-top: 24px; padding: 16px 20px; background: rgba(0,0,0,0.25); border: 1px solid rgba(0,212,170,0.08); border-radius: 10px; }
+        .jwt-info .jwt-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: rgba(224,245,240,0.3); margin-bottom: 8px; }
+        .jwt-info .jwt-token { font-family: 'Courier New', monospace; font-size: 11px; color: var(--aqua); word-break: break-all; line-height: 1.6; opacity: 0.7; }
+        .form-row .input-error { border-color: var(--coral) !important; }
+        .form-row .error-msg { font-size: 11px; color: var(--coral-soft); margin-top: 4px; display: none; }
+        .form-row .error-msg.show { display: block; }
+
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,0.5); }
+            .main-content { margin-left: 0; }
+            .hamburger { display: block; }
+            .page-content { padding: 20px 16px; }
+            .topbar { padding: 14px 16px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .search-box { width: 160px; }
+            .table-wrap { overflow-x: auto; }
+            .table-wrap table { min-width: 700px; }
+            .data-header { flex-direction: column; align-items: flex-start; }
+            .dash-welcome { flex-direction: column; text-align: center; }
+        }
+        @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } .login-card { padding: 32px 24px; } }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 99; background: rgba(2,14,24,0.6); }
+        .sidebar-overlay.show { display: block; }
+        .bg-particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .bg-particle { position: absolute; border-radius: 50%; background: radial-gradient(circle, rgba(0,212,170,0.04), transparent 70%); animation: floatParticle linear infinite; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="loginScreen">
+    <div class="login-scene">
+        <div class="star" style="top:5%;left:10%;animation-delay:0s"></div>
+        <div class="star" style="top:12%;left:30%;animation-delay:0.8s"></div>
+        <div class="star" style="top:3%;left:55%;animation-delay:1.5s"></div>
+        <div class="star" style="top:18%;left:75%;animation-delay:0.3s"></div>
+        <div class="star" style="top:8%;left:90%;animation-delay:2s"></div>
+        <div class="star" style="top:22%;left:45%;animation-delay:1.2s"></div>
+        <div class="star" style="top:15%;left:65%;animation-delay:0.6s"></div>
+        <div class="star" style="top:25%;left:20%;animation-delay:1.8s"></div>
+        <div class="moon"></div>
+        <div class="mountains"><div class="mountain mountain-1"></div><div class="mountain mountain-2"></div><div class="mountain mountain-3"></div><div class="mountain mountain-4"></div></div>
+        <div class="water">
+            <svg class="wave" viewBox="0 0 1440 40" preserveAspectRatio="none"><path d="M0,20 C240,40 480,0 720,20 C960,40 1200,0 1440,20 L1440,40 L0,40 Z"/></svg>
+            <svg class="wave wave-2" viewBox="0 0 1440 40" preserveAspectRatio="none"><path d="M0,25 C300,5 600,35 900,15 C1100,5 1300,30 1440,20 L1440,40 L0,40 Z"/></svg>
+        </div>
+        <div class="bubble" style="width:8px;height:8px;left:15%;bottom:10%;animation-duration:7s;animation-delay:0s"></div>
+        <div class="bubble" style="width:12px;height:12px;left:25%;bottom:5%;animation-duration:9s;animation-delay:1s"></div>
+        <div class="bubble" style="width:6px;height:6px;left:40%;bottom:15%;animation-duration:6s;animation-delay:2s"></div>
+        <div class="bubble" style="width:10px;height:10px;left:55%;bottom:8%;animation-duration:8s;animation-delay:0.5s"></div>
+        <div class="bubble" style="width:5px;height:5px;left:70%;bottom:12%;animation-duration:7.5s;animation-delay:3s"></div>
+        <div class="bubble" style="width:14px;height:14px;left:80%;bottom:3%;animation-duration:10s;animation-delay:1.5s"></div>
+        <div class="bubble" style="width:7px;height:7px;left:35%;bottom:20%;animation-duration:8.5s;animation-delay:4s"></div>
+        <div class="bubble" style="width:9px;height:9px;left:60%;bottom:18%;animation-duration:6.5s;animation-delay:2.5s"></div>
+        <div class="bubble" style="width:4px;height:4px;left:90%;bottom:7%;animation-duration:5.5s;animation-delay:0.8s"></div>
+        <div class="bubble" style="width:11px;height:11px;left:5%;bottom:14%;animation-duration:9.5s;animation-delay:3.5s"></div>
+    </div>
+    <div class="login-card">
+        <div class="brand">CAPLIN BETTA SHOP</div>
+        <div class="subtitle">Sistem Pemesanan Ikan Hias</div>
+        <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> Username atau password salah</div>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fas fa-user" style="margin-right:4px"></i> Username</label>
+                <input type="text" id="loginUser" placeholder="Enter Username" autocomplete="off" required>
+                <i class="fas fa-fish input-icon"></i>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock" style="margin-right:4px"></i> Password</label>
+                <input type="password" id="loginPass" placeholder="Enter Password" required>
+                <i class="fas fa-key input-icon"></i>
+            </div>
+            <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt" style="margin-right:6px"></i> Login</button>
+        </form>
+        <p style="text-align:center;margin-top:20px;font-size:11px;color:rgba(224,245,240,0.25)">Demo: admin / admin123</p>
+    </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div id="mainApp">
+    <div class="bg-particles" id="bgParticles"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2>CAPLIN BETTA</h2><p>Management System</p></div>
+        <nav class="sidebar-nav">
+            <div class="nav-label">Menu Utama</div>
+            <a class="nav-item active" data-view="dashboard" onclick="navigateTo('dashboard')"><i class="fas fa-th-large"></i> Dashboard</a>
+            <div class="nav-divider"></div>
+            <div class="nav-label">Master Data</div>
+            <a class="nav-item" data-view="dataIkan" onclick="navigateTo('dataIkan')"><span class="emoji">🐠</span> Data Ikan</a>
+            <a class="nav-item" data-view="dataUser" onclick="navigateTo('dataUser')"><span class="emoji">👥</span> Data User</a>
+            <div class="nav-divider"></div>
+            <div class="nav-label">Transaksi</div>
+            <a class="nav-item" data-view="dataPengiriman" onclick="navigateTo('dataPengiriman')"><span class="emoji">🚚</span> Data Pengiriman</a>
+            <a class="nav-item" data-view="dataPemesanan" onclick="navigateTo('dataPemesanan')"><span class="emoji">📋</span> Data Pemesanan</a>
+        </nav>
+        <div class="sidebar-footer"><a class="nav-item nav-logout" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
+    </aside>
+    <div class="main-content">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:14px">
+                <button class="hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <div class="topbar-title" id="topbarTitle">🧭 <span>Dashboard</span></div>
+            </div>
+            <div class="topbar-user"><span id="topbarUserName">Ghina Alyana</span><div class="topbar-avatar" id="topbarAvatar">G</div></div>
+        </div>
+        <div class="page-content">
+            <!-- DASHBOARD -->
+            <div class="view-section active" id="viewDashboard">
+                <div class="dash-welcome">
+                    <div class="dash-welcome-icon">🐠</div>
+                    <div><h1 id="welcomeText">Selamat Datang, Ghina Alyana</h1><p>Kelola toko ikan hias cupang kamu dengan mudah dan efisien</p></div>
+                </div>
+                <div class="stats-grid" id="statsGrid"></div>
+                <div class="betta-showcase">
+                    <svg width="200" height="140" viewBox="0 0 200 140" style="margin:0 auto 16px;display:block;opacity:0.7">
+                        <ellipse cx="90" cy="70" rx="35" ry="22" fill="none" stroke="var(--aqua)" stroke-width="1.5" opacity="0.6"/>
+                        <path d="M55,70 Q30,40 15,55 Q25,70 15,85 Q30,100 55,70" fill="none" stroke="var(--aqua)" stroke-width="1.2" opacity="0.5"/>
+                        <path d="M55,70 Q35,50 20,60" fill="none" stroke="var(--aqua-glow)" stroke-width="0.8" opacity="0.4"/>
+                        <path d="M55,70 Q35,90 20,80" fill="none" stroke="var(--aqua-glow)" stroke-width="0.8" opacity="0.4"/>
+                        <path d="M125,70 Q145,45 165,50 Q155,70 165,90 Q145,95 125,70" fill="none" stroke="var(--aqua)" stroke-width="1.2" opacity="0.5"/>
+                        <path d="M125,70 Q140,55 155,58" fill="none" stroke="var(--aqua-glow)" stroke-width="0.8" opacity="0.4"/>
+                        <path d="M125,70 Q140,85 155,82" fill="none" stroke="var(--aqua-glow)" stroke-width="0.8" opacity="0.4"/>
+                        <circle cx="115" cy="65" r="3" fill="var(--aqua-glow)" opacity="0.8"/>
+                        <path d="M80,48 Q90,20 105,48" fill="none" stroke="var(--aqua)" stroke-width="1" opacity="0.4"/>
+                        <path d="M80,92 Q90,118 105,92" fill="none" stroke="var(--aqua)" stroke-width="1" opacity="0.4"/>
+                        <circle cx="145" cy="35" r="3" fill="none" stroke="var(--aqua)" stroke-width="0.6" opacity="0.3"/>
+                        <circle cx="155" cy="22" r="2" fill="none" stroke="var(--aqua)" stroke-width="0.6" opacity="0.2"/>
+                        <circle cx="140" cy="15" r="1.5" fill="none" stroke="var(--aqua)" stroke-width="0.6" opacity="0.25"/>
+                    </svg>
+                    <h3>Betta Splendens</h3>
+                    <p>Ikan cupang atau Betta splendens merupakan salah satu ikan hias air tawar paling populer di Indonesia.<br>Dikenal karena keindahan sirip dan warnanya yang memukau.</p>
+                    <div class="jwt-info">
+                        <div class="jwt-label"><i class="fas fa-shield-alt" style="margin-right:4px"></i> JWT Token (Simulasi)</div>
+                        <div class="jwt-token" id="jwtDisplay">eyJhbGciOiJIUzI1NiIs...</div>
+                    </div>
+                </div>
+            </div>
+            <!-- DATA IKAN -->
+            <div class="view-section" id="viewDataIkan">
+                <div class="data-header"><h2>🐠 Data Ikan</h2><div class="header-actions"><div class="search-wrap"><i class="fas fa-search"></i><input class="search-box" type="text" placeholder="Cari ikan..." oninput="renderIkanTable(this.value)"></div><button class="btn-add" onclick="openIkanModal()"><i class="fas fa-plus"></i> Tambah Ikan</button></div></div>
+                <div class="table-wrap"><table><thead><tr><th>No</th><th>Gambar</th><th>Nama Ikan</th><th>Jenis Ikan</th><th>Harga</th><th>Deskripsi</th><th>Action</th></tr></thead><tbody id="ikanTableBody"></tbody></table></div>
+            </div>
+            <!-- DATA USER -->
+            <div class="view-section" id="viewDataUser">
+                <div class="data-header"><h2>👥 Data User</h2><div class="header-actions"><div class="search-wrap"><i class="fas fa-search"></i><input class="search-box" type="text" placeholder="Cari user..." oninput="renderUserTable(this.value)"></div><button class="btn-add" onclick="openUserModal()"><i class="fas fa-plus"></i> Tambah User</button></div></div>
+                <div class="table-wrap"><table><thead><tr><th>No</th><th>Nama</th><th>Username</th><th>Role</th><th>Action</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
+            </div>
+            <!-- DATA PENGIRIMAN -->
+            <div class="view-section" id="viewDataPengiriman">
+                <div class="data-header"><h2>🚚 Data Pengiriman</h2><div class="header-actions"><div class="search-wrap"><i class="fas fa-search"></i><input class="search-box" type="text" placeholder="Cari pengiriman..." oninput="renderPengirimanTable(this.value)"></div><button class="btn-add" onclick="openPengirimanModal()"><i class="fas fa-plus"></i> Tambah Pengiriman</button></div></div>
+                <div class="table-wrap"><table><thead><tr><th>No</th><th>Nama Pemesanan</th><th>Jasa Pengiriman</th><th>No Resi</th><th>Tanggal</th><th>Status</th><th>Action</th></tr></thead><tbody id="pengirimanTableBody"></tbody></table></div>
+            </div>
+            <!-- DATA PEMESANAN -->
+            <div class="view-section" id="viewDataPemesanan">
+                <div class="data-header"><h2>📋 Data Pemesanan</h2><div class="header-actions"><div class="search-wrap"><i class="fas fa-search"></i><input class="search-box" type="text" placeholder="Cari pemesanan..." oninput="renderPemesananTable(this.value)"></div><button class="btn-add" onclick="openPemesananModal()"><i class="fas fa-plus"></i> Tambah Pemesanan</button></div></div>
+                <div class="table-wrap"><table><thead><tr><th>No</th><th>Nama Pemesan</th><th>Nama Ikan</th><th>Jumlah</th><th>Total Harga</th><th>Tanggal</th><th>Status</th><th>Action</th></tr></thead><tbody id="pemesananTableBody"></tbody></table></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: IKAN ==================== -->
+<div class="modal-overlay" id="modalIkan">
+    <div class="modal-box">
+        <div class="modal-header"><h3 id="modalIkanTitle">Tambah Data Ikan</h3><button class="modal-close" onclick="closeModal('modalIkan')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="ikanId">
+            <div class="form-row"><label>Nama Ikan</label><input type="text" id="ikanNama" placeholder="Contoh: Cupang Halfmoon"><div class="error-msg" id="errIkanNama">Nama ikan wajib diisi</div></div>
+            <div class="form-row"><label>Jenis Ikan</label><select id="ikanJenis"><option value="">Pilih jenis ikan...</option><option value="Halfmoon">Halfmoon</option><option value="Crown Tail">Crown Tail</option><option value="Dumbo Ear">Dumbo Ear</option><option value="Plakat">Plakat</option><option value="Veiltail">Veiltail</option><option value="Double Tail">Double Tail</option><option value="Super Delta">Super Delta</option><option value="Half Sun">Half Sun</option><option value="Feathertail">Feathertail</option></select><div class="error-msg" id="errIkanJenis">Jenis ikan wajib dipilih</div></div>
+            <div class="form-row"><label>Harga (Rp)</label><input type="number" id="ikanHarga" placeholder="Contoh: 35000" min="0"><div class="error-msg" id="errIkanHarga">Harga wajib diisi</div></div>
+            <div class="form-row"><label>Deskripsi</label><textarea id="ikanDeskripsi" placeholder="Contoh: Sirip menyebar 180 derajat, usia 4 bulan"></textarea></div>
+            <div class="form-row"><label>Gambar</label><div class="file-upload" onclick="document.getElementById('ikanGambarInput').click()"><i class="fas fa-cloud-upload-alt"></i><span id="ikanGambarText">Klik untuk upload gambar</span><input type="file" id="ikanGambarInput" accept="image/*" style="display:none" onchange="handleFileUpload(this,'ikanGambarText')"></div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('modalIkan')">Batal</button><button class="btn-save" onclick="saveIkan()">Simpan</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: USER ==================== -->
+<div class="modal-overlay" id="modalUser">
+    <div class="modal-box">
+        <div class="modal-header"><h3 id="modalUserTitle">Tambah Data User</h3><button class="modal-close" onclick="closeModal('modalUser')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="userId">
+            <div class="form-row"><label>Nama</label><input type="text" id="userNama" placeholder="Contoh: Ghina Alyana"><div class="error-msg" id="errUserNama">Nama wajib diisi</div></div>
+            <div class="form-row"><label>Username</label><input type="text" id="userUsername" placeholder="Contoh: ghina123"><div class="error-msg" id="errUserUsername">Username wajib diisi</div></div>
+            <div class="form-row"><label>Password</label><input type="password" id="userPassword" placeholder="Minimal 6 karakter"><div class="error-msg" id="errUserPassword">Password minimal 6 karakter</div></div>
+            <div class="form-row"><label>Role</label><select id="userRole"><option value="">Pilih role...</option><option value="admin">Admin</option><option value="user">User</option></select><div class="error-msg" id="errUserRole">Role wajib dipilih</div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('modalUser')">Batal</button><button class="btn-save" onclick="saveUser()">Simpan</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: PENGIRIMAN ==================== -->
+<div class="modal-overlay" id="modalPengiriman">
+    <div class="modal-box">
+        <div class="modal-header"><h3 id="modalPengirimanTitle">Tambah Data Pengiriman</h3><button class="modal-close" onclick="closeModal('modalPengiriman')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="pengirimanId">
+            <div class="form-row"><label>Nama Pemesanan</label><input type="text" id="pengirimanNama" placeholder="Nama pemesan"><div class="error-msg" id="errPengirimanNama">Nama pemesanan wajib diisi</div></div>
+            <div class="form-row"><label>Jasa Pengiriman</label><select id="pengirimanJasa"><option value="">Pilih jasa pengiriman...</option><option value="TIKI">TIKI</option><option value="JNE">JNE</option><option value="J&T">J&T Express</option><option value="SiCepat">SiCepat</option><option value="AnterAja">AnterAja</option></select><div class="error-msg" id="errPengirimanJasa">Jasa pengiriman wajib dipilih</div></div>
+            <div class="form-row"><label>No Resi</label><input type="text" id="pengirimanResi" placeholder="Masukkan nomor resi"><div class="error-msg" id="errPengirimanResi">No resi wajib diisi</div></div>
+            <div class="form-row"><label>Tanggal Pemesanan</label><input type="date" id="pengirimanTanggal"><div class="error-msg" id="errPengirimanTanggal">Tanggal wajib diisi</div></div>
+            <div class="form-row"><label>Status</label><select id="pengirimanStatus"><option value="">Pilih status...</option><option value="proses">Proses</option><option value="dikirim">Dikirim</option><option value="selesai">Selesai</option></select><div class="error-msg" id="errPengirimanStatus">Status wajib dipilih</div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('modalPengiriman')">Batal</button><button class="btn-save" onclick="savePengiriman()">Simpan</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODAL: PEMESANAN ==================== -->
+<div class="modal-overlay" id="modalPemesanan">
+    <div class="modal-box">
+        <div class="modal-header"><h3 id="modalPemesananTitle">Tambah Data Pemesanan</h3><button class="modal-close" onclick="closeModal('modalPemesanan')"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <input type="hidden" id="pemesananId">
+            <div class="form-row"><label>Nama Pemesan</label><input type="text" id="pemesananNama" placeholder="Nama pemesan"><div class="error-msg" id="errPemesananNama">Nama pemesan wajib diisi</div></div>
+            <div class="form-row"><label>Nama Ikan</label><select id="pemesananIkan"><option value="">Pilih ikan...</option></select><div class="error-msg" id="errPemesananIkan">Ikan wajib dipilih</div></div>
+            <div class="form-row"><label>Jumlah</label><input type="number" id="pemesananJumlah" placeholder="Jumlah pesanan" min="1" value="1"><div class="error-msg" id="errPemesananJumlah">Jumlah minimal 1</div></div>
+            <div class="form-row"><label>Tanggal Pemesanan</label><input type="date" id="pemesananTanggal"><div class="error-msg" id="errPemesananTanggal">Tanggal wajib diisi</div></div>
+            <div class="form-row"><label>Status</label><select id="pemesananStatus"><option value="">Pilih status...</option><option value="proses">Proses</option><option value="dikirim">Dikirim</option><option value="selesai">Selesai</option></select><div class="error-msg" id="errPemesananStatus">Status wajib dipilih</div></div>
+            <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('modalPemesanan')">Batal</button><button class="btn-save" onclick="savePemesanan()">Simpan</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== CONFIRM ==================== -->
+<div class="confirm-overlay" id="confirmDialog">
+    <div class="confirm-box">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h4>Konfirmasi Hapus</h4>
+        <p id="confirmText">Apakah kamu yakin ingin menghapus data ini?</p>
+        <div class="confirm-actions"><button class="btn-cancel" onclick="closeConfirm()">Batal</button><button class="btn-danger" id="confirmBtn" onclick="confirmDelete()">Hapus</button></div>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==================== DATA STORE ====================
+var dataIkan = [
+    { id: 1, nama: 'Cupang Halfmoon', jenis: 'Halfmoon', harga: 35000, deskripsi: 'Sirip menyebar 180 derajat seperti bulan sabit, usia 4 bulan, Size M', gambar: 'https://picsum.photos/seed/cupang-halfmoon-blue/200/200.jpg' },
+    { id: 2, nama: 'Cupang Crowntail', jenis: 'Crown Tail', harga: 30000, deskripsi: 'Sirip berujung mahkota dengan jarum-jarum memanjang, usia 3.5 bulan, Size M', gambar: 'https://picsum.photos/seed/cupang-crowntail-red/200/200.jpg' },
+    { id: 3, nama: 'Cupang Dumbo Ear', jenis: 'Dumbo Ear', harga: 40000, deskripsi: 'Sirip dada besar menyerupai telinga gajah, usia 4 bulan, Size L', gambar: 'https://picsum.photos/seed/cupang-dumbo-ear/200/200.jpg' },
+    { id: 4, nama: 'Cupang Plakat', jenis: 'Plakat', harga: 25000, deskripsi: 'Sirip pendek dan keras, bentuk tubuh kompak, usia 3 bulan, Size M-', gambar: 'https://picsum.photos/seed/cupang-plakat-metal/200/200.jpg' },
+    { id: 5, nama: 'Cupang Veiltail', jenis: 'Veiltail', harga: 20000, deskripsi: 'Sirip panjang menjuntai indah seperti veil, usia 3 bulan, Size S', gambar: 'https://picsum.photos/seed/cupang-veiltail-wht/200/200.jpg' },
+    { id: 6, nama: 'Cupang Doubel Tail', jenis: 'Double Tail', harga: 32000, deskripsi: 'Ekor terbelah dua simetris, penampilan unik, usia 4 bulan, Size M', gambar: 'https://picsum.photos/seed/cupang-doubletail-grn/200/200.jpg' },
+    { id: 7, nama: 'Super Delta Tail (SDT)', jenis: 'Super Delta', harga: 28000, deskripsi: 'Sirip ekor melebar 120-170 derajat, hampir setengah lingkaran, usia 3.5 bulan, Size M', gambar: 'https://picsum.photos/seed/cupang-superdelta-purp/200/200.jpg' },
+    { id: 8, nama: 'Half Sun Tail (HS)', jenis: 'Half Sun', harga: 38000, deskripsi: 'Perpaduan elegan antara Halfmoon dan Crowntail, usia 4 bulan, Size L', gambar: 'https://picsum.photos/seed/cupang-halfsun-gold/200/200.jpg' },
+    { id: 9, nama: 'Feathertail', jenis: 'Feathertail', harga: 45000, deskripsi: 'Sirip ekor bergerigi halus menyerupai bulu, sangat eksotis, usia 5 bulan, Size L', gambar: 'https://picsum.photos/seed/cupang-feathertail-cyan/200/200.jpg' },
+];
+
+var dataUser = [
+    { id: 1, nama: 'Ghina Alyana', username: 'admin', password: 'admin123', role: 'admin' },
+    { id: 2, nama: 'User', username: 'user', password: 'user123', role: 'user' },
+];
+
+// Data Pemesanan sesuai permintaan: Udindin, Budi Santoso, Dewi Lestari 30/06/2026, Ucup 2/07/2026, Chaeunwo
+var dataPemesanan = [
+    { id: 1, nama: 'Udindin', ikan: 'Cupang Halfmoon', jumlah: 2, total: 70000, tanggal: '2026-06-28', status: 'selesai' },
+    { id: 2, nama: 'Budi Santoso', ikan: 'Cupang Dumbo Ear', jumlah: 1, total: 40000, tanggal: '2026-06-29', status: 'dikirim' },
+    { id: 3, nama: 'Dewi Lestari', ikan: 'Feathertail', jumlah: 1, total: 45000, tanggal: '2026-06-30', status: 'proses' },
+    { id: 4, nama: 'Ucup', ikan: 'Cupang Plakat', jumlah: 3, total: 75000, tanggal: '2026-07-02', status: 'proses' },
+    { id: 5, nama: 'Chaeunwo', ikan: 'Half Sun Tail (HS)', jumlah: 2, total: 76000, tanggal: '2026-07-03', status: 'dikirim' },
+];
+
+// Data Pengiriman disesuaikan dengan pemesanan di atas
+var dataPengiriman = [
+    { id: 1, nama: 'Udindin', jasa: 'JNE', resi: 'JNE8812034567', tanggal: '2026-06-28', status: 'selesai' },
+    { id: 2, nama: 'Budi Santoso', jasa: 'TIKI', resi: 'TIKI220987654', tanggal: '2026-06-29', status: 'dikirim' },
+    { id: 3, nama: 'Dewi Lestari', jasa: 'J&T', resi: 'JT3301567890', tanggal: '2026-06-30', status: 'proses' },
+    { id: 4, nama: 'Ucup', jasa: 'SiCepat', resi: 'SC4402345678', tanggal: '2026-07-02', status: 'proses' },
+    { id: 5, nama: 'Chaeunwo', jasa: 'AnterAja', resi: 'AJ5503456789', tanggal: '2026-07-03', status: 'dikirim' },
+];
+
+var nextId = { ikan: 10, user: 3, pengiriman: 6, pemesanan: 6 };
+var deleteCallback = null;
+var currentUser = null;
+
+// Bersihkan session lama agar login selalu tampil
+localStorage.removeItem('caplin_jwt');
+localStorage.removeItem('caplin_user');
+
+// ==================== AUTH & JWT ====================
+function generateFakeJWT(user) {
+    var header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    var payload = btoa(JSON.stringify({ id: user.id, username: user.username, role: user.role, nama: user.nama, iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 3600 }));
+    var signature = btoa('caplin-betta-secret-key-' + user.username);
+    return header + '.' + payload + '.' + signature;
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    var username = document.getElementById('loginUser').value.trim();
+    var password = document.getElementById('loginPass').value.trim();
+    var errEl = document.getElementById('loginError');
+    var user = dataUser.find(function(u) { return u.username === username && u.password === password; });
+    if (!user) { errEl.style.display = 'block'; return false; }
+    errEl.style.display = 'none';
+    currentUser = user;
+    var token = generateFakeJWT(user);
+    localStorage.setItem('caplin_jwt', token);
+    localStorage.setItem('caplin_user', JSON.stringify({ id: user.id, username: user.username, nama: user.nama, role: user.role }));
+    document.getElementById('jwtDisplay').textContent = token;
+    document.getElementById('topbarUserName').textContent = user.nama;
+    document.getElementById('topbarAvatar').textContent = user.nama.charAt(0).toUpperCase();
+    document.getElementById('welcomeText').textContent = 'Selamat Datang, ' + user.nama;
+    document.getElementById('loginScreen').style.opacity = '0';
+    document.getElementById('loginScreen').style.transition = 'opacity 0.5s ease';
+    setTimeout(function() { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; initApp(); }, 500);
+    return false;
+}
+
+function handleLogout() {
+    localStorage.removeItem('caplin_jwt'); localStorage.removeItem('caplin_user'); currentUser = null;
+    document.getElementById('mainApp').style.display = 'none';
+    document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('loginScreen').style.opacity = '1';
+    document.getElementById('loginUser').value = ''; document.getElementById('loginPass').value = '';
+    document.getElementById('loginError').style.display = 'none';
+    showToast('Berhasil logout', 'success');
+}
+
+// ==================== NAVIGASI ====================
+var viewTitles = { dashboard: '🧭 <span>Dashboard</span>', dataIkan: '🐠 <span>Data Ikan</span>', dataUser: '👥 <span>Data User</span>', dataPengiriman: '🚚 <span>Data Pengiriman</span>', dataPemesanan: '📋 <span>Data Pemesanan</span>' };
+function navigateTo(viewName) {
+    document.querySelectorAll('.view-section').forEach(function(v) { v.classList.remove('active'); });
+    var target = document.getElementById('view' + viewName.charAt(0).toUpperCase() + viewName.slice(1));
+    if (target) target.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+    var navItem = document.querySelector('.nav-item[data-view="' + viewName + '"]');
+    if (navItem) navItem.classList.add('active');
+    document.getElementById('topbarTitle').innerHTML = viewTitles[viewName] || '';
+    closeSidebar();
+    if (viewName === 'dashboard') renderDashboard();
+    if (viewName === 'dataIkan') renderIkanTable();
+    if (viewName === 'dataUser') renderUserTable();
+    if (viewName === 'dataPengiriman') renderPengirimanTable();
+    if (viewName === 'dataPemesanan') renderPemesananTable();
+}
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay').classList.toggle('show'); }
+function closeSidebar() { document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+
+// ==================== DASHBOARD ====================
+function renderDashboard() {
+    var stats = [
+        { icon: '🐠', label: 'Total Ikan', value: dataIkan.length, bg: 'rgba(0,212,170,0.1)', color: 'var(--aqua-glow)' },
+        { icon: '📋', label: 'Total Pemesanan', value: dataPemesanan.length, bg: 'rgba(245,200,66,0.1)', color: 'var(--gold)' },
+        { icon: '🚚', label: 'Dalam Pengiriman', value: dataPengiriman.filter(function(p) { return p.status !== 'selesai'; }).length, bg: 'rgba(100,149,237,0.1)', color: '#6495ED' },
+        { icon: '👥', label: 'Total User', value: dataUser.length, bg: 'rgba(255,107,107,0.1)', color: 'var(--coral-soft)' },
+    ];
+    document.getElementById('statsGrid').innerHTML = stats.map(function(s) { return '<div class="stat-card"><div class="stat-icon" style="background:' + s.bg + '">' + s.icon + '</div><div class="stat-value" style="color:' + s.color + '">' + s.value + '</div><div class="stat-label">' + s.label + '</div></div>'; }).join('');
+}
+
+// ==================== TABEL RENDER ====================
+function renderIkanTable(search) {
+    search = search || '';
+    var filtered = dataIkan.filter(function(i) { return i.nama.toLowerCase().indexOf(search.toLowerCase()) !== -1 || i.jenis.toLowerCase().indexOf(search.toLowerCase()) !== -1; });
+    var tbody = document.getElementById('ikanTableBody');
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-fish"></i>Tidak ada data ikan ditemukan</div></td></tr>'; return; }
+    tbody.innerHTML = filtered.map(function(item, idx) { return '<tr><td>' + (idx+1) + '</td><td><img class="td-img" src="' + item.gambar + '" alt="' + item.nama + '" onerror="this.src=\'https://picsum.photos/seed/fallback-' + item.id + '/200/200.jpg\'"></td><td style="font-weight:600;color:#E0F5F0">' + item.nama + '</td><td>' + item.jenis + '</td><td style="color:var(--aqua-glow);font-weight:600">Rp ' + item.harga.toLocaleString('id-ID') + '</td><td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (item.deskripsi||'-') + '</td><td><div class="table-actions"><button class="btn-action edit" onclick="editIkan(' + item.id + ')"><i class="fas fa-pen"></i></button><button class="btn-action delete" onclick="deleteIkan(' + item.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('');
+}
+
+function renderUserTable(search) {
+    search = search || '';
+    var filtered = dataUser.filter(function(u) { return u.nama.toLowerCase().indexOf(search.toLowerCase()) !== -1 || u.username.toLowerCase().indexOf(search.toLowerCase()) !== -1; });
+    var tbody = document.getElementById('userTableBody');
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-users"></i>Tidak ada data user ditemukan</div></td></tr>'; return; }
+    tbody.innerHTML = filtered.map(function(item, idx) { return '<tr><td>' + (idx+1) + '</td><td style="font-weight:600;color:#E0F5F0">' + item.nama + '</td><td>' + item.username + '</td><td><span class="badge badge-' + item.role + '">' + item.role.charAt(0).toUpperCase() + item.role.slice(1) + '</span></td><td><div class="table-actions"><button class="btn-action edit" onclick="editUser(' + item.id + ')"><i class="fas fa-pen"></i></button><button class="btn-action delete" onclick="deleteUser(' + item.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('');
+}
+
+function renderPengirimanTable(search) {
+    search = search || '';
+    var filtered = dataPengiriman.filter(function(p) { return p.nama.toLowerCase().indexOf(search.toLowerCase()) !== -1 || p.jasa.toLowerCase().indexOf(search.toLowerCase()) !== -1 || p.resi.toLowerCase().indexOf(search.toLowerCase()) !== -1; });
+    var tbody = document.getElementById('pengirimanTableBody');
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-truck"></i>Tidak ada data pengiriman ditemukan</div></td></tr>'; return; }
+    tbody.innerHTML = filtered.map(function(item, idx) { return '<tr><td>' + (idx+1) + '</td><td style="font-weight:600;color:#E0F5F0">' + item.nama + '</td><td>' + item.jasa + '</td><td style="font-family:\'Courier New\',monospace;font-size:13px">' + item.resi + '</td><td>' + formatDate(item.tanggal) + '</td><td><span class="badge badge-' + item.status + '">' + item.status.charAt(0).toUpperCase() + item.status.slice(1) + '</span></td><td><div class="table-actions"><button class="btn-action edit" onclick="editPengiriman(' + item.id + ')"><i class="fas fa-pen"></i></button><button class="btn-action delete" onclick="deletePengiriman(' + item.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('');
+}
+
+function renderPemesananTable(search) {
+    search = search || '';
+    var filtered = dataPemesanan.filter(function(p) { return p.nama.toLowerCase().indexOf(search.toLowerCase()) !== -1 || p.ikan.toLowerCase().indexOf(search.toLowerCase()) !== -1; });
+    var tbody = document.getElementById('pemesananTableBody');
+    if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><i class="fas fa-clipboard-list"></i>Tidak ada data pemesanan ditemukan</div></td></tr>'; return; }
+    tbody.innerHTML = filtered.map(function(item, idx) { return '<tr><td>' + (idx+1) + '</td><td style="font-weight:600;color:#E0F5F0">' + item.nama + '</td><td>' + item.ikan + '</td><td>' + item.jumlah + '</td><td style="color:var(--aqua-glow);font-weight:600">Rp ' + item.total.toLocaleString('id-ID') + '</td><td>' + formatDate(item.tanggal) + '</td><td><span class="badge badge-' + item.status + '">' + item.status.charAt(0).toUpperCase() + item.status.slice(1) + '</span></td><td><div class="table-actions"><button class="btn-action edit" onclick="editPemesanan(' + item.id + ')"><i class="fas fa-pen"></i></button><button class="btn-action delete" onclick="deletePemesanan(' + item.id + ')"><i class="fas fa-trash"></i></button></div></td></tr>'; }).join('');
+}
+
+// ==================== HELPERS ====================
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); clearFormErrors(); }
+function clearFormErrors() { document.querySelectorAll('.input-error').forEach(function(el) { el.classList.remove('input-error'); }); document.querySelectorAll('.error-msg').forEach(function(el) { el.classList.remove('show'); }); }
+function showFieldError(inputId, errorId) { document.getElementById(inputId).classList.add('input-error'); document.getElementById(errorId).classList.add('show'); }
+function formatDate(dateStr) { if (!dateStr) return '-'; var d = new Date(dateStr); return d.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+function handleFileUpload(input, textId) { if (input.files && input.files[0]) document.getElementById(textId).textContent = input.files[0].name; }
+
+// ==================== CRUD: IKAN ====================
+function openIkanModal(data) {
+    clearFormErrors();
+    document.getElementById('ikanId').value = ''; document.getElementById('ikanNama').value = ''; document.getElementById('ikanJenis').value = ''; document.getElementById('ikanHarga').value = ''; document.getElementById('ikanDeskripsi').value = ''; document.getElementById('ikanGambarText').textContent = 'Klik untuk upload gambar'; document.getElementById('ikanGambarInput').value = '';
+    document.getElementById('modalIkanTitle').textContent = 'Tambah Data Ikan';
+    if (data) { document.getElementById('ikanId').value = data.id; document.getElementById('ikanNama').value = data.nama; document.getElementById('ikanJenis').value = data.jenis; document.getElementById('ikanHarga').value = data.harga; document.getElementById('ikanDeskripsi').value = data.deskripsi; document.getElementById('ikanGambarText').textContent = data.gambar ? 'Gambar sudah ada' : 'Klik untuk upload gambar'; document.getElementById('modalIkanTitle').textContent = 'Edit Data Ikan'; }
+    openModal('modalIkan');
+}
+function editIkan(id) { var item = dataIkan.find(function(i) { return i.id === id; }); if (item) openIkanModal(item); }
+function saveIkan() {
+    clearFormErrors(); var valid = true;
+    var id = document.getElementById('ikanId').value, nama = document.getElementById('ikanNama').value.trim(), jenis = document.getElementById('ikanJenis').value, harga = document.getElementById('ikanHarga').value, deskripsi = document.getElementById('ikanDeskripsi').value.trim(), fileInput = document.getElementById('ikanGambarInput');
+    if (!nama) { showFieldError('ikanNama','errIkanNama'); valid = false; }
+    if (!jenis) { showFieldError('ikanJenis','errIkanJenis'); valid = false; }
+    if (!harga || parseInt(harga) < 0) { showFieldError('ikanHarga','errIkanHarga'); valid = false; }
+    if (!valid) return;
+    if (id) { var item = dataIkan.find(function(i) { return i.id === parseInt(id); }); if (item) { item.nama=nama; item.jenis=jenis; item.harga=parseInt(harga); item.deskripsi=deskripsi; if (fileInput.files&&fileInput.files[0]) item.gambar=URL.createObjectURL(fileInput.files[0]); showToast('Data ikan berhasil diperbarui','success'); } }
+    else { var n={id:nextId.ikan++,nama:nama,jenis:jenis,harga:parseInt(harga),deskripsi:deskripsi,gambar:'https://picsum.photos/seed/cupang-'+nama.replace(/\s/g,'-').toLowerCase()+'-'+Date.now()+'/200/200.jpg'}; if(fileInput.files&&fileInput.files[0]) n.gambar=URL.createObjectURL(fileInput.files[0]); dataIkan.push(n); showToast('Data ikan berhasil ditambahkan','success'); }
+    closeModal('modalIkan'); renderIkanTable(); renderDashboard();
+}
+function deleteIkan(id) { var item = dataIkan.find(function(i){return i.id===id;}); if(!item) return; document.getElementById('confirmText').textContent='Apakah kamu yakin ingin menghapus ikan "'+item.nama+'"?'; deleteCallback=function(){dataIkan=dataIkan.filter(function(i){return i.id!==id;}); renderIkanTable(); renderDashboard(); showToast('Data ikan berhasil dihapus','success');}; openConfirm(); }
+
+// ==================== CRUD: USER ====================
+function openUserModal(data) {
+    clearFormErrors();
+    document.getElementById('userId').value=''; document.getElementById('userNama').value=''; document.getElementById('userUsername').value=''; document.getElementById('userPassword').value=''; document.getElementById('userRole').value='';
+    document.getElementById('modalUserTitle').textContent='Tambah Data User'; document.getElementById('errUserPassword').textContent='Password minimal 6 karakter';
+    if(data){document.getElementById('userId').value=data.id;document.getElementById('userNama').value=data.nama;document.getElementById('userUsername').value=data.username;document.getElementById('userPassword').value='';document.getElementById('userRole').value=data.role;document.getElementById('modalUserTitle').textContent='Edit Data User';document.getElementById('errUserPassword').textContent='Kosongkan jika tidak ingin mengubah password';}
+    openModal('modalUser');
+}
+function editUser(id){var item=dataUser.find(function(u){return u.id===id;});if(item)openUserModal(item);}
+function saveUser(){
+    clearFormErrors();var valid=true;
+    var id=document.getElementById('userId').value,nama=document.getElementById('userNama').value.trim(),username=document.getElementById('userUsername').value.trim(),password=document.getElementById('userPassword').value,role=document.getElementById('userRole').value;
+    if(!nama){showFieldError('userNama','errUserNama');valid=false;} if(!username){showFieldError('userUsername','errUserUsername');valid=false;}
+    if(!id&&password.length<6){showFieldError('userPassword','errUserPassword');valid=false;} if(id&&password.length>0&&password.length<6){showFieldError('userPassword','errUserPassword');valid=false;} if(!role){showFieldError('userRole','errUserRole');valid=false;}
+    if(!valid)return;
+    if(id){var item=dataUser.find(function(u){return u.id===parseInt(id);});if(item){item.nama=nama;item.username=username;if(password.length>=6)item.password=password;item.role=role;showToast('Data user berhasil diperbarui','success');}}
+    else{dataUser.push({id:nextId.user++,nama:nama,username:username,password:password,role:role});showToast('Data user berhasil ditambahkan','success');}
+    closeModal('modalUser');renderUserTable();renderDashboard();
+}
+function deleteUser(id){var item=dataUser.find(function(u){return u.id===id;});if(!item)return;if(currentUser&&currentUser.id===id){showToast('Tidak bisa menghapus akun yang sedang digunakan','error');return;}document.getElementById('confirmText').textContent='Apakah kamu yakin ingin menghapus user "'+item.nama+'"?';deleteCallback=function(){dataUser=dataUser.filter(function(u){return u.id!==id;});renderUserTable();renderDashboard();showToast('Data user berhasil dihapus','success');};openConfirm();}
+
+// ==================== CRUD: PENGIRIMAN ====================
+function openPengirimanModal(data) {
+    clearFormErrors();
+    document.getElementById('pengirimanId').value='';document.getElementById('pengirimanNama').value='';document.getElementById('pengirimanJasa').value='';document.getElementById('pengirimanResi').value='';document.getElementById('pengirimanTanggal').value='';document.getElementById('pengirimanStatus').value='';
+    document.getElementById('modalPengirimanTitle').textContent='Tambah Data Pengiriman';
+    if(data){document.getElementById('pengirimanId').value=data.id;document.getElementById('pengirimanNama').value=data.nama;document.getElementById('pengirimanJasa').value=data.jasa;document.getElementById('pengirimanResi').value=data.resi;document.getElementById('pengirimanTanggal').value=data.tanggal;document.getElementById('pengirimanStatus').value=data.status;document.getElementById('modalPengirimanTitle').textContent='Edit Data Pengiriman';}
+    openModal('modalPengiriman');
+}
+function editPengiriman(id){var item=dataPengiriman.find(function(p){return p.id===id;});if(item)openPengirimanModal(item);}
+function savePengiriman(){
+    clearFormErrors();var valid=true;
+    var id=document.getElementById('pengirimanId').value,nama=document.getElementById('pengirimanNama').value.trim(),jasa=document.getElementById('pengirimanJasa').value,resi=document.getElementById('pengirimanResi').value.trim(),tanggal=document.getElementById('pengirimanTanggal').value,status=document.getElementById('pengirimanStatus').value;
+    if(!nama){showFieldError('pengirimanNama','errPengirimanNama');valid=false;}if(!jasa){showFieldError('pengirimanJasa','errPengirimanJasa');valid=false;}if(!resi){showFieldError('pengirimanResi','errPengirimanResi');valid=false;}if(!tanggal){showFieldError('pengirimanTanggal','errPengirimanTanggal');valid=false;}if(!status){showFieldError('pengirimanStatus','errPengirimanStatus');valid=false;}
+    if(!valid)return;
+    if(id){var item=dataPengiriman.find(function(p){return p.id===parseInt(id);});if(item){item.nama=nama;item.jasa=jasa;item.resi=resi;item.tanggal=tanggal;item.status=status;showToast('Data pengiriman berhasil diperbarui','success');}}
+    else{dataPengiriman.push({id:nextId.pengiriman++,nama:nama,jasa:jasa,resi:resi,tanggal:tanggal,status:status});showToast('Data pengiriman berhasil ditambahkan','success');}
+    closeModal('modalPengiriman');renderPengirimanTable();renderDashboard();
+}
+function deletePengiriman(id){var item=dataPengiriman.find(function(p){return p.id===id;});if(!item)return;document.getElementById('confirmText').textContent='Apakah kamu yakin ingin menghapus data pengiriman "'+item.nama+'"?';deleteCallback=function(){dataPengiriman=dataPengiriman.filter(function(p){return p.id!==id;});renderPengirimanTable();renderDashboard();showToast('Data pengiriman berhasil dihapus','success');};openConfirm();}
+
+// ==================== CRUD: PEMESANAN ====================
+function populateIkanSelect(){var s=document.getElementById('pemesananIkan');s.innerHTML='<option value="">Pilih ikan...</option>'+dataIkan.map(function(i){return'<option value="'+i.nama+'" data-harga="'+i.harga+'">'+i.nama+' — Rp '+i.harga.toLocaleString('id-ID')+'</option>';}).join('');}
+function openPemesananModal(data){
+    clearFormErrors();populateIkanSelect();
+    document.getElementById('pemesananId').value='';document.getElementById('pemesananNama').value='';document.getElementById('pemesananIkan').value='';document.getElementById('pemesananJumlah').value='1';document.getElementById('pemesananTanggal').value='';document.getElementById('pemesananStatus').value='';
+    document.getElementById('modalPemesananTitle').textContent='Tambah Data Pemesanan';
+    if(data){document.getElementById('pemesananId').value=data.id;document.getElementById('pemesananNama').value=data.nama;document.getElementById('pemesananIkan').value=data.ikan;document.getElementById('pemesananJumlah').value=data.jumlah;document.getElementById('pemesananTanggal').value=data.tanggal;document.getElementById('pemesananStatus').value=data.status;document.getElementById('modalPemesananTitle').textContent='Edit Data Pemesanan';}
+    openModal('modalPemesanan');
+}
+function editPemesanan(id){var item=dataPemesanan.find(function(p){return p.id===id;});if(item)openPemesananModal(item);}
+function savePemesanan(){
+    clearFormErrors();var valid=true;
+    var id=document.getElementById('pemesananId').value,nama=document.getElementById('pemesananNama').value.trim(),ikanNama=document.getElementById('pemesananIkan').value,jumlah=parseInt(document.getElementById('pemesananJumlah').value)||0,tanggal=document.getElementById('pemesananTanggal').value,status=document.getElementById('pemesananStatus').value;
+    if(!nama){showFieldError('pemesananNama','errPemesananNama');valid=false;}if(!ikanNama){showFieldError('pemesananIkan','errPemesananIkan');valid=false;}if(jumlah<1){showFieldError('pemesananJumlah','errPemesananJumlah');valid=false;}if(!tanggal){showFieldError('pemesananTanggal','errPemesananTanggal');valid=false;}if(!status){showFieldError('pemesananStatus','errPemesananStatus');valid=false;}
+    if(!valid)return;
+    var ikanItem=dataIkan.find(function(i){return i.nama===ikanNama;});var harga=ikanItem?ikanItem.harga:0;var total=harga*jumlah;
+    if(id){var item=dataPemesanan.find(function(p){return p.id===parseInt(id);});if(item){item.nama=nama;item.ikan=ikanNama;item.jumlah=jumlah;item.total=total;item.tanggal=tanggal;item.status=status;showToast('Data pemesanan berhasil diperbarui','success');}}
+    else{dataPemesanan.push({id:nextId.pemesanan++,nama:nama,ikan:ikanNama,jumlah:jumlah,total:total,tanggal:tanggal,status:status});showToast('Data pemesanan berhasil ditambahkan','success');}
+    closeModal('modalPemesanan');renderPemesananTable();renderDashboard();
+}
+function deletePemesanan(id){var item=dataPemesanan.find(function(p){return p.id===id;});if(!item)return;document.getElementById('confirmText').textContent='Apakah kamu yakin ingin menghapus pemesanan "'+item.nama+' — '+item.ikan+'"?';deleteCallback=function(){dataPemesanan=dataPemesanan.filter(function(p){return p.id!==id;});renderPemesananTable();renderDashboard();showToast('Data pemesanan berhasil dihapus','success');};openConfirm();}
+
+// ==================== CONFIRM & TOAST ====================
+function openConfirm(){document.getElementById('confirmDialog').classList.add('show');}
+function closeConfirm(){document.getElementById('confirmDialog').classList.remove('show');deleteCallback=null;}
+function confirmDelete(){if(deleteCallback)deleteCallback();closeConfirm();}
+function showToast(message,type){type=type||'success';var c=document.getElementById('toastContainer');var icons={success:'fa-check-circle',error:'fa-times-circle',warning:'fa-exclamation-circle'};var t=document.createElement('div');t.className='toast '+type;t.innerHTML='<i class="fas '+icons[type]+'"></i> '+message;c.appendChild(t);setTimeout(function(){t.classList.add('toast-exit');setTimeout(function(){t.remove();},300);},3000);}
+
+// ==================== BG PARTICLES ====================
+function createBgParticles(){var c=document.getElementById('bgParticles');for(var i=0;i<12;i++){var p=document.createElement('div');p.className='bg-particle';var s=Math.random()*200+80;p.style.width=s+'px';p.style.height=s+'px';p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*20+15)+'s';p.style.animationDelay=(Math.random()*10)+'s';c.appendChild(p);}}
+
+// ==================== INIT ====================
+function initApp(){renderDashboard();renderIkanTable();renderUserTable();renderPengirimanTable();renderPemesananTable();createBgParticles();}
+
+document.querySelectorAll('.modal-overlay').forEach(function(overlay){overlay.addEventListener('click',function(e){if(e.target===this){this.classList.remove('show');clearFormErrors();}});});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.show').forEach(function(m){m.classList.remove('show');});document.getElementById('confirmDialog').classList.remove('show');clearFormErrors();}});
+</script>
+</body>
+</html>
